@@ -1,17 +1,12 @@
 package com.nettyrpc.registry;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 服务注册
@@ -53,11 +48,8 @@ public class ServiceRegistry {
                 }
             });
             latch.await();
-        } catch (IOException e) {
-            LOGGER.error("", e);
-        }
-        catch (InterruptedException ex){
-            LOGGER.error("", ex);
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
         }
         return zk;
     }
@@ -68,9 +60,7 @@ public class ServiceRegistry {
             if (s == null) {
                 zk.create(Constant.ZK_REGISTRY_PATH, new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
-        } catch (KeeperException e) {
-            LOGGER.error(e.toString());
-        } catch (InterruptedException e) {
+        } catch (KeeperException | InterruptedException e) {
             LOGGER.error(e.toString());
         }
     }
@@ -80,11 +70,8 @@ public class ServiceRegistry {
             byte[] bytes = data.getBytes();
             String path = zk.create(Constant.ZK_DATA_PATH, bytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
             LOGGER.debug("create zookeeper node ({} => {})", path, data);
-        } catch (KeeperException e) {
-            LOGGER.error("", e);
-        }
-        catch (InterruptedException ex){
-            LOGGER.error("", ex);
+        } catch (KeeperException | InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }
